@@ -11,8 +11,18 @@
   border-bottom: 1px solid lightgray;
   display: flex;
   justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
-
+.app__post{
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+.app__postLeft{
+  margin-right: 20px;
+}
 .app__signup{
     display: flex;
     flex-direction: column;
