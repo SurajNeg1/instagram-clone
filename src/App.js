@@ -5,6 +5,7 @@ import {db, auth} from "./firebase";
 import Modal from '@material-ui/core/Modal';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Input } from '@material-ui/core';
+import ImageUpload from "./ImageUpload";
 
 function getModalStyle() {
   const top = 50 ;
@@ -56,9 +57,9 @@ function App() {
 },[user, username]);
 
   useEffect(()=>{
-      db.collection('post').onSnapshot(snapshot=>{
+      db.collection('post').orderBy('timestamp','desc').onSnapshot(snapshot=>{
         setPost(snapshot.docs.map(doc=>({
-          id:doc.id,
+          id:doc.id, 
           post:doc.data()
         })));
       })
@@ -74,20 +75,20 @@ function App() {
                     displayName:username
                  })
         })
-        .catch((error)=>console.log(error));
+        .catch((error)=>alert(error.message));
       setOpen(false);
   }
   const signIn= (event)=>{
     event.preventDefault();
     auth.signInWithEmailAndPassword(email,password)
-    .then()
-    .catch((e)=>alert(e.message));
+    .catch((error)=>alert(error.message));;
     
     setOpenSignIn(false);
 }
 
   return (
     <div className="app">
+     
         <Modal open={open} onClose={() => setOpen(false)}>
           <div style={modalStyle} className={classes.paper}>
             <form className="app__signup">
@@ -126,7 +127,6 @@ function App() {
                     src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png" 
                     alt="" />
               </center>
-          
               <Input 
                 placeholder="Email"
                 type="email"
@@ -139,7 +139,7 @@ function App() {
                 value={password}
                 onChange={(e)=>setPassword(e.target.value)}
               />
-              <Button type="submit" onClick={signUp}>Sign In</Button>
+              <Button type="submit" onClick={signIn}>Sign In</Button>
             </form>
         </div>
       </Modal>
@@ -147,8 +147,7 @@ function App() {
         <img className="app__headerImage"
              src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png" 
              alt="" />
-      </div>
-      {user?(
+        {user?(
         <Button onClick={() => auth.signOut()}>LogOut</Button>
       ):
       (
@@ -158,6 +157,8 @@ function App() {
         </div>
     
       )}
+      </div>
+      
       
       {
         posts.map(({id,post})=>(
@@ -168,6 +169,12 @@ function App() {
                   imageUrl={post.imageUrl}/>
         ))
       }
+      {user?.displayName ? (
+            <ImageUpload username={user.displayName}/>
+      ):(
+        <h3>Login To Upload </h3>
+      )}
+
     </div>
   );
 }
